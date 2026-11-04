@@ -1,5 +1,3 @@
-cd ~/mzfonts
-cat > README.md << 'EOF'
 # MzFonts
 
 A tiny, static, Google Fonts-style font CDN. No logging, no tracking, no cookies from the project itself. It runs on Cloudflare Pages, so Cloudflare still handles requests at its edge.
