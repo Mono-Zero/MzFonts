@@ -1,25 +1,48 @@
-cat > LICENSE << 'EOF'
-MIT License
+cd ~/mzfonts
+cat > README.md << 'EOF'
+# MzFonts
 
-Copyright (c) 2026 MonoZero
+A tiny, static, Google Fonts-style font CDN. No logging, no tracking, no cookies from the project itself. It runs on Cloudflare Pages, so Cloudflare still handles requests at its edge.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+Live: https://mzfonts.pages.dev
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+## Use it
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+    <link rel="stylesheet" href="https://mzfonts.pages.dev/roboto/index.css">
+
+Variable fonts use the family name `'Roboto Variable'`. Static fonts keep the plain name, like `'Poppins'`.
+
+## How it works
+
+Font files come from [Fontsource](https://fontsource.org), which packages Google Fonts as npm packages. These scripts only copy `.woff2` files and CSS, so there is nothing to run per request.
+
+- `fonts.txt` lists the fonts, most popular first
+- `make-list.mjs` builds that list from Google's popularity ranking
+- `build.mjs` downloads each font (variable preferred, static as fallback) into `dist/`
+- `gen-index.mjs` writes the landing page at `dist/index.html`
+
+## Build your own
+
+Needs Node 18 or newer.
+
+    node make-list.mjs 300
+    node build.mjs
+    node gen-index.mjs
+    npx wrangler pages deploy dist --project-name your-project
+
+Before deploying, create `dist/_headers` with this content:
+
+    /*
+      Access-Control-Allow-Origin: *
+      Cache-Control: public, max-age=31536000, immutable
+      X-Content-Type-Options: nosniff
+
+Edit the `DOMAIN` line and the email address in `gen-index.mjs` first.
+
+Cloudflare's free plan allows 20,000 files per deployment, and `build.mjs` stops at 19,000.
+
+## Licenses
+
+The scripts in this repo are MIT licensed (see LICENSE). The fonts are not part of this repo and keep their own licenses, mostly the SIL Open Font License 1.1, some Apache 2.0. Each font folder in a build includes its LICENSE file.
 EOF
-git init
-git status --short
+ls
